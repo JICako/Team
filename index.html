@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEAM DISTRIBUTOR // v2.0.77</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+/* ===== CSS VARIABLES ===== */
+:root {
+  --cyan: #00f5ff;
+  --purple: #b000ff;
+  --magenta: #ff00aa;
+  --bg-dark: #020510;
+  --bg-mid: #050d1f;
+  --glow-cyan: 0 0 10px #00f5ff, 0 0 30px #00f5ff55, 0 0 60px #00f5ff22;
+  --glow-purple: 0 0 10px #b000ff, 0 0 30px #b000ff55, 0 0 60px #b000ff22;
+  --glow-magenta: 0 0 10px #ff00aa, 0 0 30px #ff00aa55, 0 0 60px #ff00aa22;
+  --font-main: 'Orbitron', monospace;
+  --font-mono: 'Share Tech Mono', monospace;
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-dark);
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ===== PARTICLE CANVAS ===== */
+#particles-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== SCANLINE OVERLAY ===== */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,245,255,0.015) 2px,
+    rgba(0,245,255,0.015) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+  animation: scanlines 8s linear infinite;
+}
+
+@keyframes scanlines {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+}
+
+/* ===== MAIN WRAPPER ===== */
+.app {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+/* ===== HEADER ===== */
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.header-logo {
+  font-family: var(--font-main);
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  color: var(--cyan);
+  text-shadow: var(--glow-cyan);
+  animation: flicker 6s infinite;
+}
+
+.header-sub {
+  font-size: 0.7rem;
+  color: var(--purple);
+  letter-spacing: 0.5em;
+  text-shadow: var(--glow-purple);
+  margin-top: 0.3rem;
+  opacity: 0.8;
+}
+
+@keyframes flicker {
+  0%, 95%, 100% { opacity: 1; }
+  96% { opacity: 0.6; }
+  97% { opacity: 1; }
+  98% { opacity: 0.4; }
+  99% { opacity: 1; }
+}
+
+/* ===== SCREENS ===== */
+.screen {
+  display: none;
+  width: 100%;
+  max-width: 700px;
+  animation: screenIn 0.5s ease forwards;
+}
+.screen.active { display: block; }
+
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== CARD / PANEL ===== */
+.panel {
+  background: linear-gradient(135deg, rgba(5,13,31,0.95), rgba(2,5,16,0.98));
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 4px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  animation: topLine 3s ease-in-out infinite;
+}
+
+@keyframes topLine {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.panel-title {
+  font-family: var(--font-main);
+  font-size: 0.75rem;
+  letter-spacing: 0.4em;
+  color: var(--purple);
+  text-shadow: var(--glow-purple);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+}
+
+/* ===== FORM ELEMENTS ===== */
+.input-group {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.input-group.narrow { max-width: 340px; }
+
+input[type="text"], input[type="number"] {
+  background: rgba(0,245,255,0.05);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 2px;
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  padding: 0.65rem 1rem;
+  flex: 1;
+  outline: none;
+  transition: all 0.2s;
+  min-width: 150px;
+}
+
+input[type="text"]:focus, input[type="number"]:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 15px rgba(0,245,255,0.2);
+  background: rgba(0,245,255,0.08);
+}
+
+input::placeholder { color: rgba(0,245,255,0.35); }
+
+input[type="number"] { max-width: 120px; min-width: 90px; }
+
+/* ===== BUTTONS ===== */
+.btn {
+  font-family: var(--font-main);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  border: none;
+  border-radius: 2px;
+  padding: 0.65rem 1.4rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: left 0.4s;
+}
+.btn:hover::after { left: 100%; }
+
+.btn-cyan {
+  background: rgba(0,245,255,0.1);
+  color: var(--cyan);
+  border: 1px solid var(--cyan);
+  box-shadow: 0 0 10px rgba(0,245,255,0.2);
+}
+.btn-cyan:hover {
+  background: rgba(0,245,255,0.2);
+  box-shadow: var(--glow-cyan);
+  transform: translateY(-1px);
+}
+
+.btn-purple {
+  background: rgba(176,0,255,0.1);
+  color: var(--purple);
+  border: 1px solid var(--purple);
+  box-shadow: 0 0 10px rgba(176,0,255,0.2);
+}
+.btn-purple:hover {
+  background: rgba(176,0,255,0.2);
+  box-shadow: var(--glow-purple);
+  transform: translateY(-1px);
+}
+
+.btn-start {
+  width: 100%;
+  padding: 1rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.4em;
+  background: linear-gradient(135deg, rgba(176,0,255,0.15), rgba(0,245,255,0.15));
+  color: var(--cyan);
+  border: 1px solid var(--cyan);
+  margin-top: 1.5rem;
+}
+.btn-start:hover {
+  background: linear-gradient(135deg, rgba(176,0,255,0.3), rgba(0,245,255,0.3));
+  box-shadow: var(--glow-cyan), var(--glow-purple);
+}
+
+.btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ===== TEAM LIST ===== */
+.teams-list {
+  list-style: none;
+  margin-bottom: 1rem;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.teams-list::-webkit-scrollbar { width: 4px; }
+.teams-list::-webkit-scrollbar-track { background: rgba(0,245,255,0.05); }
+.teams-list::-webkit-scrollbar-thumb { background: var(--cyan); }
+
+.team-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(0,245,255,0.15);
+  border-radius: 2px;
+  margin-bottom: 0.4rem;
+  background: rgba(0,245,255,0.03);
+  animation: itemIn 0.3s ease;
+  font-size: 0.9rem;
+}
+
+@keyframes itemIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.team-item-name { flex: 1; color: var(--cyan); }
+
+.team-delete {
+  background: none;
+  border: none;
+  color: rgba(255,0,100,0.6);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 0.3rem;
+  transition: color 0.2s;
+  font-family: var(--font-mono);
+}
+.team-delete:hover { color: #ff0060; }
+
+.teams-empty {
+  text-align: center;
+  color: rgba(0,245,255,0.3);
+  font-size: 0.8rem;
+  padding: 1rem;
+  border: 1px dashed rgba(0,245,255,0.15);
+  border-radius: 2px;
+}
+
+.error-msg {
+  color: var(--magenta);
+  font-size: 0.78rem;
+  text-shadow: var(--glow-magenta);
+  margin-top: 0.5rem;
+  animation: fadeIn 0.3s ease;
+  letter-spacing: 0.1em;
+}
+
+.label {
+  font-size: 0.72rem;
+  color: rgba(0,245,255,0.5);
+  letter-spacing: 0.2em;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid rgba(0,245,255,0.1);
+  margin: 1.5rem 0;
+}
+
+/* ===== DISTRIBUTION SCREEN ===== */
+#screen-distribute { max-width: 800px; }
+
+.distribute-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 620px) {
+  .distribute-layout { grid-template-columns: 1fr; }
+}
+
+/* ===== SCAN ZONE ===== */
+.scan-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.result-display {
+  width: 100%;
+  text-align: center;
+  padding: 2rem 1rem;
+  border: 1px solid rgba(0,245,255,0.2);
+  border-radius: 4px;
+  background: rgba(0,245,255,0.03);
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.result-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.5em;
+  color: rgba(0,245,255,0.4);
+  margin-bottom: 0.5rem;
+}
+
+.result-team-name {
+  font-family: var(--font-main);
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  font-weight: 900;
+  color: var(--cyan);
+  text-shadow: var(--glow-cyan);
+  letter-spacing: 0.1em;
+  word-break: break-word;
+}
+
+.result-team-name.glitch {
+  animation: glitch 0.4s steps(2) forwards;
+}
+
+@keyframes glitch {
+  0% { text-shadow: 4px 0 var(--magenta), -4px 0 var(--cyan); transform: skewX(-5deg); opacity: 0.5; }
+  20% { text-shadow: -4px 0 var(--magenta), 4px 0 var(--cyan); transform: skewX(3deg) scaleX(1.05); }
+  40% { text-shadow: 2px 0 var(--purple), -2px 0 var(--cyan); transform: skewX(-2deg); opacity: 0.8; }
+  60% { text-shadow: -2px 0 var(--magenta), 2px 0 var(--purple); transform: skewX(1deg); }
+  80% { text-shadow: 1px 0 var(--cyan), -1px 0 var(--magenta); transform: skewX(0); opacity: 0.9; }
+  100% { text-shadow: var(--glow-cyan); transform: none; opacity: 1; }
+}
+
+.result-empty-text {
+  font-size: 0.8rem;
+  color: rgba(0,245,255,0.25);
+  letter-spacing: 0.2em;
+}
+
+/* ===== FINGERPRINT BUTTON ===== */
+.scan-btn-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.scan-hint {
+  font-size: 0.68rem;
+  color: rgba(0,245,255,0.4);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.scan-btn {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 2px solid var(--cyan);
+  background: radial-gradient(circle at center, rgba(0,245,255,0.1), rgba(0,245,255,0.03));
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s;
+  box-shadow: 0 0 20px rgba(0,245,255,0.2), inset 0 0 20px rgba(0,245,255,0.05);
+}
+
+.scan-btn:hover:not(:disabled) {
+  box-shadow: var(--glow-cyan), inset 0 0 30px rgba(0,245,255,0.1);
+  transform: scale(1.04);
+}
+
+.scan-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Pulse rings */
+.scan-btn::before, .scan-btn::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid var(--cyan);
+  opacity: 0;
+}
+.scan-btn:not(:disabled)::before {
+  width: 130px; height: 130px;
+  animation: ring 2s ease-out infinite;
+}
+.scan-btn:not(:disabled)::after {
+  width: 155px; height: 155px;
+  animation: ring 2s ease-out 0.7s infinite;
+}
+@keyframes ring {
+  0% { transform: scale(0.85); opacity: 0.6; }
+  100% { transform: scale(1.1); opacity: 0; }
+}
+
+/* Fingerprint SVG icon */
+.fp-icon {
+  width: 54px;
+  height: 54px;
+  color: var(--cyan);
+  filter: drop-shadow(0 0 6px var(--cyan));
+  transition: all 0.3s;
+}
+
+/* ===== SCANNING ANIMATION ===== */
+.scan-btn.scanning {
+  border-color: var(--magenta);
+  box-shadow: 0 0 30px rgba(255,0,170,0.4), inset 0 0 30px rgba(255,0,170,0.1);
+  animation: scanPulse 0.5s ease-in-out infinite alternate;
+}
+.scan-btn.scanning .fp-icon {
+  color: var(--magenta);
+  filter: drop-shadow(0 0 8px var(--magenta));
+  animation: fpSpin 2.5s linear infinite;
+}
+
+@keyframes scanPulse {
+  from { box-shadow: 0 0 20px rgba(255,0,170,0.3), inset 0 0 20px rgba(255,0,170,0.05); }
+  to   { box-shadow: 0 0 50px rgba(255,0,170,0.6), inset 0 0 40px rgba(255,0,170,0.15); }
+}
+@keyframes fpSpin {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.1) rotate(180deg); }
+  100% { transform: scale(1) rotate(360deg); }
+}
+
+/* Scan line effect inside result display */
+.scan-line {
+  position: absolute;
+  left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--magenta), transparent);
+  box-shadow: 0 0 10px var(--magenta);
+  top: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.scanning-active .scan-line {
+  animation: scanMove 0.6s ease-in-out infinite;
+  opacity: 1;
+}
+@keyframes scanMove {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+/* ===== TEAMS COUNTER PANEL ===== */
+.teams-counter-panel .panel-title { margin-bottom: 1rem; }
+
+.counter-list { list-style: none; }
+
+.counter-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+  margin-bottom: 0.4rem;
+  border: 1px solid rgba(0,245,255,0.12);
+  border-radius: 2px;
+  background: rgba(0,245,255,0.02);
+  transition: all 0.3s;
+  font-size: 0.82rem;
+  gap: 0.5rem;
+}
+
+.counter-item.full {
+  border-color: rgba(176,0,255,0.4);
+  background: rgba(176,0,255,0.05);
+  opacity: 0.7;
+}
+
+.counter-item.full .c-name { color: var(--purple); }
+
+.counter-item.highlight {
+  border-color: var(--cyan);
+  background: rgba(0,245,255,0.08);
+  box-shadow: 0 0 10px rgba(0,245,255,0.15);
+  animation: highlight 1s ease;
+}
+
+@keyframes highlight {
+  0% { box-shadow: 0 0 30px rgba(0,245,255,0.5); }
+  100% { box-shadow: 0 0 10px rgba(0,245,255,0.15); }
+}
+
+.c-name {
+  flex: 1;
+  color: var(--cyan);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.c-count {
+  font-family: var(--font-main);
+  font-weight: 700;
+  color: var(--cyan);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.c-badge {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+
+.c-badge.full-badge {
+  background: rgba(176,0,255,0.2);
+  color: var(--purple);
+  border: 1px solid rgba(176,0,255,0.4);
+}
+
+/* ===== DONE MESSAGE ===== */
+.done-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(2,5,16,0.85);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.5s ease;
+}
+.done-overlay.visible { display: flex; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.done-box {
+  text-align: center;
+  padding: 3rem 3.5rem;
+  border: 1px solid var(--cyan);
+  background: linear-gradient(135deg, rgba(5,13,31,0.99), rgba(2,5,16,0.99));
+  box-shadow: var(--glow-cyan);
+  border-radius: 4px;
+  animation: doneIn 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+
+@keyframes doneIn {
+  from { transform: scale(0.5) rotate(-5deg); opacity: 0; }
+  to { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.done-title {
+  font-family: var(--font-main);
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  font-weight: 900;
+  color: var(--cyan);
+  text-shadow: var(--glow-cyan);
+  letter-spacing: 0.3em;
+  margin-bottom: 0.5rem;
+}
+
+.done-sub {
+  color: rgba(0,245,255,0.5);
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  margin-bottom: 1.5rem;
+}
+
+.btn-reset {
+  background: rgba(0,245,255,0.1);
+  color: var(--cyan);
+  border: 1px solid var(--cyan);
+  font-family: var(--font-main);
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  padding: 0.75rem 2rem;
+  cursor: pointer;
+  border-radius: 2px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.btn-reset:hover { box-shadow: var(--glow-cyan); background: rgba(0,245,255,0.2); }
+
+/* ===== BACK BUTTON ===== */
+.top-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.btn-back {
+  background: none;
+  border: 1px solid rgba(0,245,255,0.3);
+  color: rgba(0,245,255,0.6);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: 0.1em;
+  transition: all 0.2s;
+}
+.btn-back:hover { border-color: var(--cyan); color: var(--cyan); }
+
+.status-bar {
+  font-size: 0.68rem;
+  color: rgba(0,245,255,0.4);
+  letter-spacing: 0.2em;
+  margin-left: auto;
+}
+</style>
+</head>
+<body>
+
+<!-- Background Particles -->
+<canvas id="particles-canvas"></canvas>
+
+<div class="app">
+  <header class="header">
+    <div class="header-logo">▸ TEAM DISTRIBUTOR</div>
+    <div class="header-sub">// NEURAL ALLOCATION SYSTEM v2.0.77</div>
+  </header>
+
+  <!-- ========== SCREEN 1: SETUP ========== -->
+  <section id="screen-setup" class="screen active">
+    <div class="panel">
+      <div class="panel-title">// 01. КОНФИГУРАЦИЯ КОМАНД</div>
+
+      <label class="label">НАЗВАНИЕ КОМАНДЫ</label>
+      <div class="input-group">
+        <input type="text" id="team-input" placeholder="ENTER TEAM NAME..." maxlength="30" autocomplete="off">
+        <button class="btn btn-cyan" onclick="addTeam()">+ ДОБАВИТЬ</button>
+      </div>
+      <div id="add-error" class="error-msg" style="display:none;"></div>
+
+      <!-- Team list -->
+      <div id="teams-container">
+        <div class="teams-empty" id="teams-empty">// NO TEAMS DEFINED — ADD AT LEAST ONE</div>
+        <ul class="teams-list" id="teams-list" style="display:none;"></ul>
+      </div>
+
+      <hr class="divider">
+
+      <div class="panel-title">// 02. ПАРАМЕТРЫ РАСПРЕДЕЛЕНИЯ</div>
+
+      <label class="label">МАКС. УЧАСТНИКОВ НА КОМАНДУ</label>
+      <div class="input-group narrow">
+        <input type="number" id="max-input" placeholder="N" min="1" max="9999" value="">
+      </div>
+      <div id="start-error" class="error-msg" style="display:none;"></div>
+
+      <button class="btn btn-start" onclick="startDistribution()">
+        ⟫ НАЧАТЬ РАСПРЕДЕЛЕНИЕ ⟪
+      </button>
+    </div>
+  </section>
+
+  <!-- ========== SCREEN 2: DISTRIBUTION ========== -->
+  <section id="screen-distribute" class="screen">
+    <div class="top-bar">
+      <button class="btn-back" onclick="goBack()">◂ НАЗАД</button>
+      <div class="status-bar" id="status-bar">STATUS: READY</div>
+    </div>
+
+    <div class="distribute-layout">
+      <!-- Left: scan zone -->
+      <div class="panel scan-zone">
+        <div class="panel-title">// СКАНИРОВАНИЕ УЧАСТНИКА</div>
+
+        <div class="result-display" id="result-display">
+          <div class="scan-line" id="scan-line"></div>
+          <div class="result-label">НАЗНАЧЕНА КОМАНДА</div>
+          <div class="result-team-name" id="result-name">
+            <span class="result-empty-text">— ОЖИДАНИЕ СКАНА —</span>
+          </div>
+        </div>
+
+        <div class="scan-btn-wrap">
+          <button class="scan-btn" id="scan-btn" onclick="doScan()" title="Нажмите для сканирования">
+            <!-- Fingerprint SVG -->
+            <svg class="fp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a10 10 0 0 1 7.39 16.74"/>
+              <path d="M12 2a10 10 0 0 0-7.88 16.16"/>
+              <path d="M12 6a6 6 0 0 1 5.6 8.17"/>
+              <path d="M12 6a6 6 0 0 0-5.71 7.87"/>
+              <path d="M12 10a2 2 0 0 1 1.73 2.98"/>
+              <path d="M12 10a2 2 0 0 0-1.8 2.88"/>
+              <path d="M12 14v7"/>
+              <path d="M12 14a4 4 0 0 0 3.4 6.93"/>
+              <path d="M12 14a4 4 0 0 1-3.5 6.78"/>
+            </svg>
+          </button>
+          <div class="scan-hint" id="scan-hint">НАЖМИТЕ ДЛЯ СКАНИРОВАНИЯ</div>
+        </div>
+      </div>
+
+      <!-- Right: teams counter -->
+      <div class="panel teams-counter-panel">
+        <div class="panel-title">// СТАТУС КОМАНД</div>
+        <ul class="counter-list" id="counter-list"></ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Done overlay -->
+<div class="done-overlay" id="done-overlay">
+  <div class="done-box">
+    <div class="done-title">✓ РАСПРЕДЕЛЕНИЕ</div>
+    <div class="done-title" style="color:var(--magenta);text-shadow:var(--glow-magenta)">ЗАВЕРШЕНО</div>
+    <div class="done-sub">// ALL SLOTS ALLOCATED — SYSTEM COMPLETE</div>
+    <button class="btn-reset" onclick="resetAll()">↺ НАЧАТЬ ЗАНОВО</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  PARTICLES BACKGROUND
+// ============================================================
+(function() {
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Create particles
+  for (let i = 0; i < 80; i++) {
+    particles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 1.5 + 0.3,
+      alpha: Math.random() * 0.5 + 0.1,
+      color: Math.random() > 0.5 ? '0,245,255' : '176,0,255'
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // Grid lines (terminal effect)
+    ctx.strokeStyle = 'rgba(0,245,255,0.03)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 60) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let y = 0; y < H; y += 60) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    // Particles
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W;
+      if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H;
+      if (p.y > H) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.color},${p.alpha})`;
+      ctx.fill();
+    });
+
+    // Connect close particles
+    particles.forEach((a, i) => {
+      particles.slice(i + 1).forEach(b => {
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 100) {
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = `rgba(0,245,255,${0.08 * (1 - dist / 100)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      });
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ============================================================
+//  APP STATE
+// ============================================================
+let teams = [];        // [{ name, count }]
+let maxPerTeam = 0;
+let isScanning = false;
+
+// ============================================================
+//  SOUND via Web Audio API
+// ============================================================
+function playBeep(freq = 800, dur = 0.15, type = 'sine') {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.5, ctx.currentTime + dur);
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+
+function playScanSound() {
+  // Series of beeps for scan effect
+  [200, 400, 600, 900, 1200].forEach((f, i) => {
+    setTimeout(() => playBeep(f, 0.12, 'sawtooth'), i * 120);
+  });
+}
+
+function playSuccessSound() {
+  [600, 900, 1200].forEach((f, i) => {
+    setTimeout(() => playBeep(f, 0.2, 'sine'), i * 100);
+  });
+}
+
+// ============================================================
+//  SCREEN 1: SETUP
+// ============================================================
+function addTeam() {
+  const input = document.getElementById('team-input');
+  const name = input.value.trim().toUpperCase();
+  const errEl = document.getElementById('add-error');
+
+  if (!name) {
+    showError(errEl, '// ERROR: ВВЕДИТЕ НАЗВАНИЕ КОМАНДЫ');
+    return;
+  }
+  if (teams.find(t => t.name === name)) {
+    showError(errEl, '// ERROR: КОМАНДА УЖЕ СУЩЕСТВУЕТ');
+    return;
+  }
+
+  teams.push({ name, count: 0 });
+  input.value = '';
+  errEl.style.display = 'none';
+  renderTeamsList();
+  playBeep(500, 0.1);
+}
+
+function removeTeam(index) {
+  teams.splice(index, 1);
+  renderTeamsList();
+}
+
+function renderTeamsList() {
+  const list = document.getElementById('teams-list');
+  const empty = document.getElementById('teams-empty');
+
+  if (teams.length === 0) {
+    list.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  list.style.display = 'block';
+  list.innerHTML = '';
+
+  teams.forEach((team, i) => {
+    const li = document.createElement('li');
+    li.className = 'team-item';
+    li.innerHTML = `
+      <span class="team-item-name">▸ ${team.name}</span>
+      <button class="team-delete" onclick="removeTeam(${i})" title="Удалить">✕</button>
+    `;
+    list.appendChild(li);
+  });
+}
+
+function startDistribution() {
+  const maxInput = document.getElementById('max-input');
+  const max = parseInt(maxInput.value);
+  const errEl = document.getElementById('start-error');
+
+  if (teams.length === 0) {
+    showError(errEl, '// ERROR: ДОБАВЬТЕ ХОТЯ БЫ ОДНУ КОМАНДУ');
+    return;
+  }
+  if (!max || max < 1) {
+    showError(errEl, '// ERROR: УКАЖИТЕ МАКСИМАЛЬНОЕ ЧИСЛО УЧАСТНИКОВ');
+    return;
+  }
+
+  maxPerTeam = max;
+  // Reset counts
+  teams.forEach(t => t.count = 0);
+  errEl.style.display = 'none';
+
+  renderCounterList();
+  updateStatusBar();
+  showScreen('screen-distribute');
+  playBeep(800, 0.3);
+}
+
+// ============================================================
+//  SCREEN 2: DISTRIBUTION
+// ============================================================
+function renderCounterList() {
+  const list = document.getElementById('counter-list');
+  list.innerHTML = '';
+  teams.forEach((team, i) => {
+    const full = team.count >= maxPerTeam;
+    const li = document.createElement('li');
+    li.className = `counter-item${full ? ' full' : ''}`;
+    li.id = `counter-item-${i}`;
+    li.innerHTML = `
+      <span class="c-name">▸ ${team.name}</span>
+      <span class="c-count">${team.count}/${maxPerTeam}</span>
+      ${full ? '<span class="c-badge full-badge">FULL</span>' : ''}
+    `;
+    list.appendChild(li);
+  });
+}
+
+function updateCounterItem(index) {
+  const team = teams[index];
+  const full = team.count >= maxPerTeam;
+  const li = document.getElementById(`counter-item-${index}`);
+  if (!li) return;
+  li.className = `counter-item${full ? ' full' : ''}`;
+  li.innerHTML = `
+    <span class="c-name">▸ ${team.name}</span>
+    <span class="c-count">${team.count}/${maxPerTeam}</span>
+    ${full ? '<span class="c-badge full-badge">FULL</span>' : ''}
+  `;
+}
+
+function updateStatusBar() {
+  const available = teams.filter(t => t.count < maxPerTeam).length;
+  const total = teams.length;
+  document.getElementById('status-bar').textContent =
+    `STATUS: ${available}/${total} TEAMS AVAILABLE`;
+}
+
+function doScan() {
+  if (isScanning) return;
+
+  // Get available teams
+  const available = teams.filter(t => t.count < maxPerTeam);
+  if (available.length === 0) return;
+
+  isScanning = true;
+  const btn = document.getElementById('scan-btn');
+  const resultDisplay = document.getElementById('result-display');
+  const resultName = document.getElementById('result-name');
+  const hint = document.getElementById('scan-hint');
+
+  // Start scanning state
+  btn.classList.add('scanning');
+  btn.disabled = true;
+  resultDisplay.classList.add('scanning-active');
+  hint.textContent = 'СКАНИРОВАНИЕ...';
+  resultName.innerHTML = '<span class="result-empty-text">// ANALYZING...</span>';
+
+  // Vibration API
+  if (navigator.vibrate) navigator.vibrate([50, 50, 50, 100, 200]);
+
+  playScanSound();
+
+  // Glitchy interim updates
+  let ticks = 0;
+  const randomChars = '!@#$%^&*<>?/\\|0123456789ABCDEF';
+  const glitchInterval = setInterval(() => {
+    ticks++;
+    const rnd = Array.from({length: 6}, () =>
+      randomChars[Math.floor(Math.random() * randomChars.length)]
+    ).join('');
+    resultName.innerHTML = `<span style="color:var(--magenta);text-shadow:var(--glow-magenta);font-family:var(--font-main)">${rnd}</span>`;
+  }, 150);
+
+  // After scan duration
+  setTimeout(() => {
+    clearInterval(glitchInterval);
+
+    // Pick random available team
+    const chosen = available[Math.floor(Math.random() * available.length)];
+    const chosenIndex = teams.indexOf(chosen);
+    teams[chosenIndex].count++;
+
+    // Show result with glitch effect
+    resultName.textContent = chosen.name;
+    resultName.className = 'result-team-name glitch';
+    setTimeout(() => { resultName.className = 'result-team-name'; }, 500);
+
+    // Update counter
+    updateCounterItem(chosenIndex);
+
+    // Highlight row
+    const li = document.getElementById(`counter-item-${chosenIndex}`);
+    if (li) {
+      li.classList.add('highlight');
+      setTimeout(() => li.classList.remove('highlight'), 1500);
+    }
+
+    // End scanning state
+    btn.classList.remove('scanning');
+    resultDisplay.classList.remove('scanning-active');
+    updateStatusBar();
+    playSuccessSound();
+
+    // Check if all full
+    const stillAvailable = teams.filter(t => t.count < maxPerTeam);
+    if (stillAvailable.length === 0) {
+      hint.textContent = 'ВСЕ КОМАНДЫ ЗАПОЛНЕНЫ';
+      btn.disabled = true;
+      setTimeout(() => {
+        document.getElementById('done-overlay').classList.add('visible');
+        playBeep(1000, 0.5);
+      }, 800);
+    } else {
+      btn.disabled = false;
+      hint.textContent = 'НАЖМИТЕ ДЛЯ СКАНИРОВАНИЯ';
+    }
+
+    isScanning = false;
+  }, 2200);
+}
+
+// ============================================================
+//  NAVIGATION
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goBack() {
+  showScreen('screen-setup');
+  // Reset distribution state
+  teams.forEach(t => t.count = 0);
+}
+
+function resetAll() {
+  document.getElementById('done-overlay').classList.remove('visible');
+  teams = [];
+  maxPerTeam = 0;
+  renderTeamsList();
+  document.getElementById('max-input').value = '';
+  document.getElementById('result-name').innerHTML = '<span class="result-empty-text">— ОЖИДАНИЕ СКАНА —</span>';
+  document.getElementById('scan-hint').textContent = 'НАЖМИТЕ ДЛЯ СКАНИРОВАНИЯ';
+  document.getElementById('scan-btn').disabled = false;
+  showScreen('screen-setup');
+}
+
+// ============================================================
+//  HELPERS
+// ============================================================
+function showError(el, msg) {
+  el.textContent = msg;
+  el.style.display = 'block';
+  playBeep(200, 0.2, 'square');
+  setTimeout(() => { el.style.display = 'none'; }, 3000);
+}
+
+// Enter key support
+document.getElementById('team-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addTeam();
+});
+</script>
+</body>
+</html>
