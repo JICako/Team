@@ -686,6 +686,42 @@ input[type="number"] { max-width: 120px; min-width: 90px; }
   letter-spacing: 0.2em;
   margin-left: auto;
 }
+
+/* ===== FULLSCREEN BUTTON ===== */
+.btn-fullscreen {
+  background: none;
+  border: 1px solid rgba(0,245,255,0.3);
+  color: rgba(0,245,255,0.6);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: 0.1em;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-fullscreen:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  box-shadow: 0 0 10px rgba(0,245,255,0.2);
+}
+.btn-fullscreen svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* Header fullscreen button row */
+.header-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.75rem;
+}
 </style>
 </head>
 <body>
@@ -697,6 +733,15 @@ input[type="number"] { max-width: 120px; min-width: 90px; }
   <header class="header">
     <div class="header-logo">▸ TEAM DISTRIBUTOR</div>
     <div class="header-sub">// NEURAL ALLOCATION SYSTEM v2.0.77</div>
+    <div class="header-actions">
+      <button class="btn-fullscreen" onclick="toggleFullscreen()" title="Полноэкранный режим">
+        <svg id="fs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+          <path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+        </svg>
+        <span id="fs-label">FULLSCREEN</span>
+      </button>
+    </div>
   </header>
 
   <!-- ========== SCREEN 1: SETUP ========== -->
@@ -738,6 +783,12 @@ input[type="number"] { max-width: 120px; min-width: 90px; }
     <div class="top-bar">
       <button class="btn-back" onclick="goBack()">◂ НАЗАД</button>
       <div class="status-bar" id="status-bar">STATUS: READY</div>
+      <button class="btn-fullscreen" onclick="toggleFullscreen()" title="Полноэкранный режим">
+        <svg id="fs-icon-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+          <path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+        </svg>
+      </button>
     </div>
 
     <div class="distribute-layout">
@@ -1147,6 +1198,35 @@ function showError(el, msg) {
 document.getElementById('team-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') addTeam();
 });
+
+// ============================================================
+//  FULLSCREEN
+// ============================================================
+// SVG paths for expand and collapse icons
+const ICON_EXPAND  = '<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>';
+const ICON_COLLAPSE = '<path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/>';
+
+function updateFsIcons() {
+  const isFs = !!document.fullscreenElement;
+  const icon  = document.getElementById('fs-icon');
+  const icon2 = document.getElementById('fs-icon-2');
+  const label = document.getElementById('fs-label');
+  if (icon)  icon.innerHTML  = isFs ? ICON_COLLAPSE : ICON_EXPAND;
+  if (icon2) icon2.innerHTML = isFs ? ICON_COLLAPSE : ICON_EXPAND;
+  if (label) label.textContent = isFs ? 'EXIT FULLSCREEN' : 'FULLSCREEN';
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+  playBeep(400, 0.1);
+}
+
+// Update icons whenever fullscreen state changes (e.g. user presses Esc)
+document.addEventListener('fullscreenchange', updateFsIcons);
 </script>
 </body>
 </html>
